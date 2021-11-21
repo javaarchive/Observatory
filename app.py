@@ -83,6 +83,7 @@ def not_found_error(error):
     return render_template('errors/404.html'), 404
 
 if not app.debug:
+    # controls messages appearing in the console/terminal
     file_handler = FileHandler('error.log')
     file_handler.setFormatter(
         Formatter('%(asctime)s %(levelname)s: %(message)s [in %(pathname)s:%(lineno)d]')
