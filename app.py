@@ -7,6 +7,7 @@ load_dotenv()
 
 from flask import Flask, render_template, request
 from flask_sqlalchemy import SQLAlchemy
+from flask_login import LoginManager
 import logging
 from logging import Formatter, FileHandler
 from forms import *
@@ -18,6 +19,7 @@ import os
 
 app = Flask(__name__)
 app.config.from_object('config')
+# makes a database
 db = SQLAlchemy(app)
 
 # Automatically tear down SQLAlchemy.
