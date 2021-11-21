@@ -1,3 +1,4 @@
+'''
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
@@ -28,3 +29,4 @@ class User(Base):
 
 # Create tables.
 Base.metadata.create_all(bind=engine)
+'''

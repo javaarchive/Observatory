@@ -7,11 +7,13 @@ load_dotenv()
 
 from flask import Flask, render_template, request
 from flask_sqlalchemy import SQLAlchemy
-from flask_login import LoginManager
+# from flask_login import LoginManager
 import logging
 from logging import Formatter, FileHandler
-from forms import *
+# from forms import *
 import os
+
+
 
 #----------------------------------------------------------------------------#
 # App Configuration. This gets values from config.py so we have a easy place to change things. 
@@ -19,27 +21,18 @@ import os
 
 app = Flask(__name__)
 app.config.from_object('config')
+
 # makes a database
 db = SQLAlchemy(app)
 
+from api import api,db_session
+
 # Automatically tear down SQLAlchemy.
 
-# @app.teardown_request
-# def shutdown_session(exception=None):
-#    db_session.remove()
+@app.teardown_request
+def shutdown_session(exception=None):
+    db_session.remove()
 
-
-# Login required decorator.
-
-def login_required(test):
-    @wraps(test)
-    def wrap(*args, **kwargs):
-        if 'logged_in' in session:
-            return test(*args, **kwargs)
-        else:
-            flash('You need to login first.')
-            return redirect(url_for('login'))
-    return wrap
 
 #----------------------------------------------------------------------------#
 # Controllers.
@@ -55,23 +48,7 @@ def home():
 def about():
     return render_template('pages/placeholder.about.html')
 
-# login forms
-@app.route('/login')
-def login():
-    form = LoginForm(request.form)
-    return render_template('forms/login.html', form=form)
-
-
-@app.route('/register')
-def register():
-    form = RegisterForm(request.form)
-    return render_template('forms/register.html', form=form)
-
-
-@app.route('/forgot')
-def forgot():
-    form = ForgotForm(request.form)
-    return render_template('forms/forgot.html', form=form)
+app.register_blueprint(api)
 
 # Error handlers.
 
@@ -97,6 +74,7 @@ if not app.debug:
     file_handler.setLevel(logging.INFO)
     app.logger.addHandler(file_handler)
     app.logger.info('errors')
+
 
 #----------------------------------------------------------------------------#
 # Launch.

@@ -4,7 +4,8 @@ from wtforms.validators import DataRequired, EqualTo, Length
 
 # Set your classes here.
 
-
+# removed temporarily
+'''
 class RegisterForm(Form):
     name = StringField(
         'Username', validators=[DataRequired(), Length(min=6, max=25)]
@@ -31,3 +32,4 @@ class ForgotForm(Form):
     email = StringField(
         'Email', validators=[DataRequired(), Length(min=6, max=40)]
     )
+'''
