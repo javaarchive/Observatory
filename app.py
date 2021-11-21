@@ -48,7 +48,16 @@ def home():
 def about():
     return render_template('pages/placeholder.about.html')
 
-app.register_blueprint(api)
+# exit routes because stopping is broken
+@app.route("/destroy")
+def destroy():
+    exit()
+@app.route("/destroy2")
+def destroy2():
+    import sys
+    sys.exit(0)
+
+app.register_blueprint(api,url_prefix='/api')
 
 # Error handlers.
 

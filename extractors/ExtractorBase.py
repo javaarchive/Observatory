@@ -13,7 +13,12 @@ class ExtractorBase:
         # return the relevant data for a url
         self.driver.get(url)
         content = self.driver.page_source
-
+        soup = BeautifulSoup(content, 'html.parser')
+        if(url.find('amazon') != -1):
+            pw = soup.find('span', 'a-price-whole')
+            pf = soup.find('span', 'a-price-fraction')
+            return pw.get_text() + pf.get_text()
+            
         pass
 
     def is_valid_url(self, url):
