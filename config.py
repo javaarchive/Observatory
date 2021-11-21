@@ -11,4 +11,4 @@ DEBUG = True
 SECRET_KEY = os.environ.get("SECRET");
 
 # Connect to the database
-SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(basedir, 'database.db')
+SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(basedir, 'database.db') # put our database in the current directory
