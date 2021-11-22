@@ -30,10 +30,11 @@ class Webpage(Base):
     url = Column(String(100),unique=True)
     name = Column(String(50))
     productID = Column(String(40))
-    def __init__(self, url, name):
+    def __init__(self, url, name, productID):
         self.id = gen.next()
         self.url = url
         self.name = name;
+        seff.productID = productID 
 
 class WebpageDataResult(Base):
     __tablename__ = 'webpage_data'
