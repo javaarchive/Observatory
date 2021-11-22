@@ -1,0 +1,14 @@
+{% extends 'layouts/main.html' %}
+{% block title %}Create a product{% endblock %}
+{% block content %}
+<script src="/static/js/create_product.js"></script>
+<h1>Create a new product</h1>
+<div id="alerts">
+
+</div>
+<form id="product-creation-form">
+    <input type="text" name="name" id="product-name" placeholder="Product Name" class="form-control" required>
+    <button type="submit" class="btn btn-success">Create!</button>
+</form>
+
+{% endblock %}

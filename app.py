@@ -48,6 +48,18 @@ def home():
 def about():
     return render_template('pages/placeholder.about.html')
 
+@app.route('/create_product')
+def create_product():
+    return render_template('pages/create_product.html')
+
+@app.route('/edit_product/<id>')
+def edit_product(id):
+    return render_template('pages/edit_product.html')
+
+@app.route('/add_webpage')
+def add_webpage():
+    return render_template('pages/add_webpage.html')
+
 # exit routes because stopping is broken
 @app.route("/destroy")
 def destroy():

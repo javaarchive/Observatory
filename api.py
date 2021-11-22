@@ -20,10 +20,13 @@ db_session = scoped_session(sessionmaker(autocommit=False,
 Base = declarative_base()
 
 # Models
-class Products(Base):
+class Product(Base):
     __tablename__ = 'products'
     id = Column(String(40), primary_key=True) # unique uuid ig
     name = Column(String(40))
+    def __init__(self, name):
+        self.id = gen.next()
+        self.name = name
 class Webpage(Base):
     __tablename__ = 'webpages'
     id = Column(String(40), primary_key=True) # unique uuid ig
@@ -34,7 +37,7 @@ class Webpage(Base):
         self.id = gen.next()
         self.url = url
         self.name = name;
-        seff.productID = productID 
+        self.productID = productID 
 
 class WebpageDataResult(Base):
     __tablename__ = 'webpage_data'
@@ -42,7 +45,11 @@ class WebpageDataResult(Base):
     webpage_id = Column(String(40)) 
     data = Column(String(2048)) # json encoded data
     date = Column(BigInteger()) # unix timestamp
-
+    def __init__(self, webpage_id, data, date):
+        self.id = gen.next()
+        self.webpage_id = webpage_id
+        self.data = data
+        self.date = date
 
 
 # Routes
@@ -58,9 +65,24 @@ def everything():
 def find_webpage(id):
     return jsonify(db_session.query(Webpage).filter_by(id=id).first()) # send data
 
-@api.route('/product/<productID>')
+@api.route('/product/<productID>',methods=['GET'])
 def find_product(productID):
-    return jsonify(db_session.query(Products).filter_by(id=productID).first()) # send data
+    return jsonify(db_session.query(Product).filter_by(id=productID).first()) # send data
+
+@api.route('/product_name/<name>',methods = ["POST"])
+def add_product(productName):
+    if db_session.query(Product).filter_by(name = productName).count() > 0:
+        return jsonify({
+            "status": "error",
+            "message": ""
+        })
+    product = Product(productName)
+    db_session.add(product)
+    db_session.commit()
+    return jsonify({
+       "status": "ok",
+       "id": product.id
+    })
 
 @api.route('/webpages_for_product/<productID>')
 def filter_webpages_by_product(productID):
