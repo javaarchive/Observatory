@@ -1,0 +1,19 @@
+{% extends 'layouts/main.html' %}
+{% block title %}Add Webpage{% endblock %}
+{% block content %}
+<script src="/static/js/add_webpage.js"></script>
+<h1>Add a webpage</h1>
+<p>
+    Sends a webpage into the database to be processed at frequent intervals.
+</p>
+<div id="alerts">
+
+</div>
+<form id="add-webpage-form">
+    <input type="text" name="name" id="product-name" placeholder="Product Name" class="form-control" required>
+    <input type="url" name="url" id="url" placeholder="Webpage url" class="form-control" required>
+    <input type="text" name="name" id="name" placeholder="Memorable Name for Webpage" class="form-control" required>
+    <button type="submit" class="btn btn-success">Add!</button>
+</form>
+
+{% endblock %}
