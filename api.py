@@ -113,7 +113,7 @@ def data_fetch_loop():
 
     is_fetching = False
 
-job = scheduler.add_job(data_fetch_loop, 'interval', seconds=10)
+job = scheduler.add_job(data_fetch_loop, 'interval', seconds=30)
 
 scheduler.start()
 
@@ -135,6 +135,18 @@ def syncThreads():
 @api.route('/all_webpages')
 def everything():
     return jsonify(db_session.query(Webpage).all())
+
+@api.route('/all_products')
+def everyproducts():
+    return jsonify(db_session.query(Product).all())
+
+@api.route('/webpages_for/<productID>')
+def webpages_for(productID):
+    return jsonify(db_session.query(Webpage).filter(Webpage.productID == productID).all())
+
+@api.route('/data_for/<webpageID>')
+def data_for_webpage(webpageID):
+    return jsonify(db_session.query(WebpageDataResult).filter_by(webpage_id = webpageID).all())
 
 @api.route('/unschedule')
 def unschedule():

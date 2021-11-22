@@ -60,7 +60,6 @@ def edit_product(id):
 def add_webpage():
     return render_template('pages/add_webpage.html')
 
-
 @app.route('/products')
 def products():
     return render_template('pages/products.html')
