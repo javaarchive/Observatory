@@ -10,6 +10,7 @@ class ExtractorBase:
     def extract_data(self, url):
         # return the relevant data for a url
         self.driver.get(url)
+        '''
         content = self.driver.page_source
         soup = BeautifulSoup(content, 'html.parser')
         
@@ -32,6 +33,7 @@ class ExtractorBase:
             ret = {pw[i].get_text() : result[i].get_text() for i in range(len(pw))}
             return ret
         #more sites
+        '''
 
     def is_valid_url(self, url):
         return False
