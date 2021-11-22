@@ -8,3 +8,4 @@ coverage
 # pycrypto
 Flask-Login
 python-dotenv
+snowflake-id
