@@ -95,18 +95,21 @@ def data_fetch_loop():
 
     for webpage in webpages:
         print("Processing",webpage.id)
-        price = next(filter(lambda ext: ext.is_valid_url(webpage.url),extractors)).extract_data(webpage.url)
-        obj = {
-            "webpage_id": webpage.id,
-            "url": webpage.url,
-            "name": webpage.name,
-            "productID": webpage.productID,
-            "price": price,
-            "date": int(time.time()),
-            "data": json.dumps({"price": price})
-        }
-        newProductData.put(obj)
-        print("inserting",obj)
+        try:
+            price = next(filter(lambda ext: ext.is_valid_url(webpage.url),extractors)).extract_data(webpage.url)
+            obj = {
+                "webpage_id": webpage.id,
+                "url": webpage.url,
+                "name": webpage.name,
+                "productID": webpage.productID,
+                "price": price,
+                "date": int(time.time()),
+                "data": json.dumps({"price": price})
+            }
+            newProductData.put(obj)
+            print("inserting",obj)
+        except Exception as ex:
+            print("Error processing", webpage.url, ex)
 
     is_fetching = False
 
