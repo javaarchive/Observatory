@@ -48,6 +48,12 @@ docReady(() => {
                     prodTitle.innerText = webpageInfo.name;
                     dataDiv.appendChild(prodTitle);
 
+                    let prodLink = document.createElement("a");
+                    prodLink.className = "product-link";
+                    prodLink.href = webpageInfo.url;
+                    prodLink.innerText = webpageInfo.url;
+                    dataDiv.appendChild(prodLink);
+
                     let priceDiv = document.createElement("div");
                     priceDiv.className = "product-last-price";
                     priceDiv.innerText = "Last price: " + collectedWebpageData[0].price;

@@ -113,7 +113,7 @@ def data_fetch_loop():
 
     is_fetching = False
 
-job = scheduler.add_job(data_fetch_loop, 'interval', seconds=30)
+job = scheduler.add_job(data_fetch_loop, 'interval', seconds=180)
 
 scheduler.start()
 
