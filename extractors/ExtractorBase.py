@@ -20,7 +20,7 @@ class ExtractorBase:
             pw = soup.find('div', 'web-migration-tof__PriceFontSize-sc-14z8sos-16 dqRAOH')
             return pw.get_text()
         else:
-            
+
         #more sites
         
         pass
