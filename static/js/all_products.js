@@ -92,18 +92,25 @@ docReady(() => {
                     });
 
                     console.log(points);
-                    
-                    let priceGraphobj = new Chart(priceGraph.getContext("2d"), {
+                    let chartContainerDiv = document.createElement('div');
+                    chartContainerDiv.className = "chart-container";
+                    chartContainerDiv.appendChild(priceGraph);
+                    dataDiv.appendChild(chartContainerDiv); // must happen first to workaround buf
+                    let priceGraphCtx = priceGraph.getContext("2d");
+                    let priceGraphobj = new Chart(priceGraphCtx, {
                         type: "line",
-                        datasets: [{
+                        data:{datasets: [{
                             label: "Price",
                             data: points,
+                            fill: false,
+                            tension: 0.1,
+                            borderColor: 'rgb(75,192,192)'
                            // borderWidth: 1,
                            // backgroundColor: 'rgb(255, 99, 132)',
                            // borderColor: 'rgb(255, 99, 132)',
                           //  borderColor: "#ff0400",
                           //  backgroundColor: "#ff0400",
-                        }],
+                        }]},
                         options:{
                             scales: {
                                 x:{
@@ -119,11 +126,12 @@ docReady(() => {
                             }
                         }
                     });
+
+                    priceGraphobj.update();
+
                     window.lc = priceGraphobj;
 
                     console.log(priceGraphobj);
-
-                    dataDiv.appendChild(priceGraph);
 
                 }));
                 dataDiv.className = "product-all-data";
