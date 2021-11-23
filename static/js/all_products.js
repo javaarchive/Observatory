@@ -1,3 +1,16 @@
+function migrateIfNeeded(data) {
+    if(!data.price){
+        data.price = "-1";
+    }else if(data.price.includes("$")){
+        data.price = data.price.replace("$", "");
+    }
+    if(typeof data.price === "string"){
+        data.price = parseFloat(data.price);
+    }
+    return data;
+}
+
+
 docReady(() => {
     document.getElementById("products-list").innerText = "Loading...";
     fetch("/api/all_products").then(async resp => {
@@ -35,7 +48,7 @@ docReady(() => {
                     collectedWebpageData = collectedWebpageData.sort((a, b) => {
                         return b.date - a.date;
                     }).map(statistic => {
-                        return {...statistic, ...JSON.parse(statistic.data)}
+                        return migrateIfNeeded({...statistic, ...JSON.parse(statistic.data)});
                     });
                     if(!clearedLoading){
                         clearedLoading = true;
@@ -59,8 +72,57 @@ docReady(() => {
                     priceDiv.innerText = "Last price: " + collectedWebpageData[0].price;
                     dataDiv.appendChild(priceDiv);
 
-                    let priceGraph = document.createElement("div");
+                    let priceGraph = document.createElement("canvas");
                     priceGraph.className = "product-price-graph";
+                    priceGraph.id = "price-graph-" + product.id + "-" + webpage.id;
+                    priceGraph.width = "800";
+                    priceGraph.height = "600";
+
+                    // maxmin
+                    let arrMax = collectedWebpageData.map(s => s.price).reduce((a,b) => Math.max(a,b));
+                    let arrMin = collectedWebpageData.map(s => s.price).reduce((a,b) => Math.min(a,b));
+
+                    console.log(collectedWebpageData);
+                    console.log(arrMin,arrMax,collectedWebpageData[0].date, collectedWebpageData[collectedWebpageData.length - 1].date);
+                    let points = collectedWebpageData.map(statistic => {
+                        return {
+                            x: statistic.date,
+                            y: statistic.price
+                        };
+                    });
+
+                    console.log(points);
+                    
+                    let priceGraphobj = new Chart(priceGraph.getContext("2d"), {
+                        type: "line",
+                        datasets: [{
+                            label: "Price",
+                            data: points,
+                           // borderWidth: 1,
+                           // backgroundColor: 'rgb(255, 99, 132)',
+                           // borderColor: 'rgb(255, 99, 132)',
+                          //  borderColor: "#ff0400",
+                          //  backgroundColor: "#ff0400",
+                        }],
+                        options:{
+                            scales: {
+                                x:{
+                                    min: collectedWebpageData[collectedWebpageData.length - 1].date,
+                                    max: collectedWebpageData[0].date,
+                                    type: "linear"
+                                },
+                                y:{
+                                    min: arrMin - 10,
+                                    max: Math.max(arrMax,arrMin + 10) + 10,
+                                    type: "linear"
+                                }
+                            }
+                        }
+                    });
+                    window.lc = priceGraphobj;
+
+                    console.log(priceGraphobj);
+
                     dataDiv.appendChild(priceGraph);
 
                 }));
