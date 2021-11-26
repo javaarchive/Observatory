@@ -5,8 +5,10 @@
 from dotenv import load_dotenv
 load_dotenv()
 
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
+from flask_admin.contrib.sqla import ModelView
+from flask_admin import Admin
 # from flask_login import LoginManager
 import logging
 from logging import Formatter, FileHandler
@@ -25,7 +27,7 @@ app.config.from_object('config')
 # makes a database
 db = SQLAlchemy(app)
 
-from api import api,db_session
+from api import api,db_session,Product,Webpage,WebpageDataResult
 
 # Automatically tear down SQLAlchemy.
 
@@ -38,10 +40,10 @@ def shutdown_session(exception=None):
 # Controllers.
 #----------------------------------------------------------------------------#
 
-# send about page from templates/placeholder.home.html
+# send about page from templates/home.html
 @app.route('/')
 def home():
-    return render_template('pages/placeholder.home.html')
+    return render_template('pages/home.html', is_authenticated=(os.environ.get('ADMIN_SECRET') == request.cookies.get("secret")))
 
 # send about page from templates/placeholder.about.html
 @app.route('/about')
@@ -60,10 +62,18 @@ def edit_product(id):
 def add_webpage():
     return render_template('pages/add_webpage.html')
 
-
 @app.route('/products')
 def products():
     return render_template('pages/products.html')
+
+@app.route('/try_login', methods = ['POST'])
+def try_login():
+    if os.environ.get('ADMIN_SECRET') == request.form.get("password"):
+        response = redirect(url_for('products'))
+        response.set_cookie('secret', os.environ.get('ADMIN_SECRET'))
+        return response
+    else:
+        return redirect(url_for('home'))
 
 # exit routes because stopping is broken
 @app.route("/destroy")
@@ -75,6 +85,24 @@ def destroy2():
     sys.exit(0)
 
 app.register_blueprint(api,url_prefix='/api')
+app.config["SECRET_KEY"] = os.environ.get("SECRET")
+if not os.environ.get("SECRET"):
+    import random
+    app.config["SECRET_KEY"] = "xxx" + str(random.randint(0,100000000000)) + "xxx"
+app.config['FLASK_ADMIN_SWATCH'] = 'lumen'
+
+admin = Admin(app, name='Observatory', template_mode='bootstrap3')
+class RestrictedModelView(ModelView):
+
+    def is_accessible(self):
+        return request.cookies.get('secret') == os.environ.get("ADMIN_SECRET")
+
+    def inaccessible_callback(self, name, **kwargs):
+        # redirect to login page if user doesn't have access
+        return redirect(url_for('/', next=request.url))
+admin.add_view(RestrictedModelView(Product, db_session))
+admin.add_view(RestrictedModelView(Webpage, db_session))
+admin.add_view(RestrictedModelView(WebpageDataResult, db_session))
 
 # Error handlers.
 

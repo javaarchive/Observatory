@@ -10,12 +10,13 @@ from sqlalchemy.ext.declarative import declarative_base
 
 from snowflake import SnowflakeGenerator
 
-import time, json
+import time, json, os
 
 import queue
 
 from extractors.all_extractors import create_instances
 
+from functools import wraps
 from dataclasses import dataclass
 
 gen = SnowflakeGenerator(42)
@@ -95,28 +96,43 @@ def data_fetch_loop():
 
     for webpage in webpages:
         print("Processing",webpage.id)
-        price = next(filter(lambda ext: ext.is_valid_url(webpage.url),extractors)).extract_data(webpage.url)
-        obj = {
-            "webpage_id": webpage.id,
-            "url": webpage.url,
-            "name": webpage.name,
-            "productID": webpage.productID,
-            "price": price,
-            "date": int(time.time()),
-            "data": json.dumps({"price": price})
-        }
-        newProductData.put(obj)
-        print("inserting",obj)
+        try:
+            price = next(filter(lambda ext: ext.is_valid_url(webpage.url),extractors)).extract_data(webpage.url)
+            obj = {
+                "webpage_id": webpage.id,
+                "url": webpage.url,
+                "name": webpage.name,
+                "productID": webpage.productID,
+                "price": price,
+                "date": int(time.time()),
+                "data": json.dumps({"price": price})
+            }
+            newProductData.put(obj)
+            print("inserting",obj)
+        except Exception as ex:
+            print("Error processing", webpage.url, ex)
 
     is_fetching = False
 
-job = scheduler.add_job(data_fetch_loop, 'interval', seconds=10)
+job = scheduler.add_job(data_fetch_loop, 'interval', seconds=180)
 
 scheduler.start()
 
 # Routes
 
 api = Blueprint('api', __name__)
+
+def requirePoorAuth(func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        if os.environ.get("ADMIN_SECRET"):
+            if request.cookies.get("secret") == os.environ.get("ADMIN_SECRET"):
+                return func(*args, **kwargs)
+            else:
+                return jsonify({"error": "Not authorized"}), 401
+        else:
+            func(*args, **kwargs)
+    return wrapper
 
 @api.before_request
 def syncThreads():
@@ -133,6 +149,18 @@ def syncThreads():
 def everything():
     return jsonify(db_session.query(Webpage).all())
 
+@api.route('/all_products')
+def everyproducts():
+    return jsonify(db_session.query(Product).all())
+
+@api.route('/webpages_for/<productID>')
+def webpages_for(productID):
+    return jsonify(db_session.query(Webpage).filter(Webpage.productID == productID).all())
+
+@api.route('/data_for/<webpageID>')
+def data_for_webpage(webpageID):
+    return jsonify(db_session.query(WebpageDataResult).filter_by(webpage_id = webpageID).all())
+
 @api.route('/unschedule')
 def unschedule():
     scheduler.remove_job(job.id)
@@ -147,6 +175,7 @@ def find_product(productID):
     return jsonify(db_session.query(Product).filter_by(id=productID).first()) # send data
 
 @api.route('/product_name/<productName>',methods = ["POST"])
+@requirePoorAuth
 def add_product(productName):
     if db_session.query(Product).filter_by(name = productName).count() > 0:
         return jsonify({
@@ -162,6 +191,7 @@ def add_product(productName):
     })
 
 @api.route('/add_webpage_for_product/<productName>',methods = ["POST"])
+@requirePoorAuth
 def add_webpage_for_product(productName):
     if db_session.query(Product).filter_by(name = productName).count() != 1:
         return jsonify({

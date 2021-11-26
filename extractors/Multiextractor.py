@@ -19,7 +19,7 @@ class MultiExtractor(ExtractorBase):
             }).children)
             #returns price
             print(priceElem.getText())
-            return priceElem.getText()[1:]#pw.get_text() + pf.get_text()
+            return priceElem.getText().replace("$","")#pw.get_text() + pf.get_text()
 
         elif "target" in url:
             #for Target
@@ -28,7 +28,7 @@ class MultiExtractor(ExtractorBase):
             })
             #returns price only
             print(pw,pw.getText())
-            return pw.getText()[1:]
+            return pw.getText().replace("$","")
         elif "google" in url:
             #for google shopping
             # div class for airpod, mac,  brands -> aULzUe IuHnof
