@@ -5,8 +5,11 @@ from bs4 import BeautifulSoup
 import os
 class ExtractorBase:
     def __init__(self):
-        self.driver = webdriver.Chrome(os.getenv('CHROMEDRIVER_LOCATION','/home/raymond/chromedriver'))
-
+        if os.getenv('PHANTOMJS_LOCATION') is None:
+            self.driver = webdriver.Chrome(os.getenv('CHROMEDRIVER_LOCATION','/home/raymond/chromedriver'))
+        else:
+            self.driver = webdriver.PhantomJS(os.getenv('PHANTOMJS_LOCATION'))
+        self.driver.set_window_size(1920, 960)
     def extract_data(self, url):
         # return the relevant data for a url
         self.driver.get(url)

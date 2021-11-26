@@ -27,7 +27,7 @@ app.config.from_object('config')
 # makes a database
 db = SQLAlchemy(app)
 
-from api import api,db_session
+from api import api,db_session,Product,Webpage,WebpageDataResult
 
 # Automatically tear down SQLAlchemy.
 
