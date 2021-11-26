@@ -1,7 +1,7 @@
 function migrateIfNeeded(data) {
     if(!data.price){
         data.price = "-1";
-    }else if(data.price.includes("$")){
+    }else if(typeof data.price === "string" && data.price.includes("$")){
         data.price = data.price.replace("$", "");
     }
     if(typeof data.price === "string"){
@@ -66,9 +66,14 @@ docReady(() => {
                     prodLink.href = webpageInfo.url;
                     prodLink.innerText = webpageInfo.url;
                     dataDiv.appendChild(prodLink);
-
+                    
                     let priceDiv = document.createElement("div");
                     priceDiv.className = "product-last-price";
+                    if(collectedWebpageData.length == 0){
+                        priceDiv.innerText = "No data collected yet. ";
+                        dataDiv.appendChild(priceDiv);
+                        return;
+                    }
                     priceDiv.innerText = "Last price: " + collectedWebpageData[0].price;
                     dataDiv.appendChild(priceDiv);
 
@@ -77,7 +82,7 @@ docReady(() => {
                     priceGraph.id = "price-graph-" + product.id + "-" + webpage.id;
                     priceGraph.width = "800";
                     priceGraph.height = "600";
-
+                    
                     // maxmin
                     let arrMax = collectedWebpageData.map(s => s.price).reduce((a,b) => Math.max(a,b));
                     let arrMin = collectedWebpageData.map(s => s.price).reduce((a,b) => Math.min(a,b));
@@ -137,9 +142,11 @@ docReady(() => {
                 dataDiv.className = "product-all-data";
             }));
         }catch(ex){
+            console.log(ex);
             set_alert_danger("Error" + ex);
         }
     }).catch(err => {
+        console.log(err);
         set_alert_danger("Error" + err);
     });
 });

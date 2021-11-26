@@ -97,7 +97,11 @@ def data_fetch_loop():
     for webpage in webpages:
         print("Processing",webpage.id)
         try:
-            price = next(filter(lambda ext: ext.is_valid_url(webpage.url),extractors)).extract_data(webpage.url)
+            extractor = next(filter(lambda ext: ext.is_valid_url(webpage.url),extractors))
+            if extractor is None:
+                print("No extractor found for", webpage.url)
+                continue
+            price = extractor.extract_data(webpage.url)
             obj = {
                 "webpage_id": webpage.id,
                 "url": webpage.url,
@@ -114,7 +118,7 @@ def data_fetch_loop():
 
     is_fetching = False
 
-job = scheduler.add_job(data_fetch_loop, 'interval', seconds=180)
+job = scheduler.add_job(data_fetch_loop, 'interval', seconds=60*5)
 
 scheduler.start()
 
@@ -131,7 +135,7 @@ def requirePoorAuth(func):
             else:
                 return jsonify({"error": "Not authorized"}), 401
         else:
-            func(*args, **kwargs)
+            return func(*args, **kwargs)
     return wrapper
 
 @api.before_request
@@ -145,6 +149,12 @@ def syncThreads():
         db_session.commit()
 
 # when your browser wants the data for the the site item
+
+@api.route('/force_refetch')
+def force_resync():
+    data_fetch_loop()
+    return "Gotcha!"
+
 @api.route('/all_webpages')
 def everything():
     return jsonify(db_session.query(Webpage).all())

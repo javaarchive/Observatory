@@ -4,12 +4,19 @@ from bs4 import BeautifulSoup
 
 import os
 class ExtractorBase:
+    globalDriver = None
+
     def __init__(self):
+        if ExtractorBase.globalDriver is not None:
+            self.driver = ExtractorBase.globalDriver
+            return
         if os.getenv('PHANTOMJS_LOCATION') is None:
             self.driver = webdriver.Chrome(os.getenv('CHROMEDRIVER_LOCATION','/home/raymond/chromedriver'))
         else:
-            self.driver = webdriver.PhantomJS(os.getenv('PHANTOMJS_LOCATION'))
+            self.driver = webdriver.PhantomJS(executable_path=os.getenv('PHANTOMJS_LOCATION'))
         self.driver.set_window_size(1920, 960)
+        # self.driver.set_page_load_timeout(60)
+        ExtractorBase.globalDriver = self.driver
     def extract_data(self, url):
         # return the relevant data for a url
         self.driver.get(url)
