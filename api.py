@@ -10,12 +10,13 @@ from sqlalchemy.ext.declarative import declarative_base
 
 from snowflake import SnowflakeGenerator
 
-import time, json
+import time, json, os
 
 import queue
 
 from extractors.all_extractors import create_instances
 
+from functools import wraps
 from dataclasses import dataclass
 
 gen = SnowflakeGenerator(42)
@@ -121,6 +122,18 @@ scheduler.start()
 
 api = Blueprint('api', __name__)
 
+def requirePoorAuth(func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        if os.environ.get("ADMIN_SECRET"):
+            if request.cookies.get("secret") == os.environ.get("ADMIN_SECRET"):
+                return func(*args, **kwargs)
+            else:
+                return jsonify({"error": "Not authorized"}), 401
+        else:
+            func(*args, **kwargs)
+    return wrapper
+
 @api.before_request
 def syncThreads():
     global current_webpages
@@ -162,6 +175,7 @@ def find_product(productID):
     return jsonify(db_session.query(Product).filter_by(id=productID).first()) # send data
 
 @api.route('/product_name/<productName>',methods = ["POST"])
+@requirePoorAuth
 def add_product(productName):
     if db_session.query(Product).filter_by(name = productName).count() > 0:
         return jsonify({
@@ -177,6 +191,7 @@ def add_product(productName):
     })
 
 @api.route('/add_webpage_for_product/<productName>',methods = ["POST"])
+@requirePoorAuth
 def add_webpage_for_product(productName):
     if db_session.query(Product).filter_by(name = productName).count() != 1:
         return jsonify({

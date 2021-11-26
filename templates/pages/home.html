@@ -1,0 +1,17 @@
+{% extends 'layouts/main.html' %}
+{% block title %}Home{% endblock %}
+{% block content %}
+
+<h1>Hello there</h1>
+{% if is_authenticated %}
+<h1>You are logged in</h1>
+<p>To log out, clear your cookies</p>
+{% else %}
+<form method="post" action="/try_login">
+    <input type="password" name="password" placeholder="password" class="form-control" />
+    <button type="submit" class = "btn btn-success">Attempt Login</button>
+</form>
+  
+{% endif %}
+
+{% endblock %}

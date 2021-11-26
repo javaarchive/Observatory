@@ -9,3 +9,5 @@ coverage
 Flask-Login
 python-dotenv
 snowflake-id
+selenium
+apscheduler
