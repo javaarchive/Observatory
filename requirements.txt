@@ -11,3 +11,4 @@ python-dotenv
 snowflake-id
 selenium
 apscheduler
+flask_admin
