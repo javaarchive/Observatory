@@ -12,3 +12,4 @@ snowflake-id
 selenium
 apscheduler
 flask_admin
+BeautifulSoup
