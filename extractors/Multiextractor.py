@@ -8,7 +8,7 @@ class MultiExtractor(ExtractorBase):
     def extract_data(self,url):
         ExtractorBase.extract_data(self,url) # superclass call
         content = self.driver.page_source
-        soup = BeautifulSoup(content, 'html.parser')
+        soup = BeautifulSoup(content, 'lxml')
         if "amazon" in url:                
             #for amazon
             # pw = soup.find('span', 'a-price-whole')

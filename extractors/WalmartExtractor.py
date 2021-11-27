@@ -2,17 +2,17 @@ from extractors.ExtractorBase import ExtractorBase
 
 from bs4 import BeautifulSoup
 
-class BestBuyExtractor(ExtractorBase):
+class WalmartExtractor(ExtractorBase):
     def __init__(self):
-        super(BestBuyExtractor, self).__init__()
+        super(WalmartExtractor, self).__init__()
     def extract_data(self,url):
         ExtractorBase.extract_data(self,url) # superclass call
         content = self.driver.page_source
         soup = BeautifulSoup(content, 'lxml')
-        priceElem = next(soup.find('div', {
-                'class': ['priceView-hero-price','priceView-customer-price']
-        }).children)
+        priceElem = soup.find('div', {
+                'itemprop':  "price"
+        })
         return float(priceElem.getText().replace("$",""))
 
     def is_valid_url(self, url: str):
-        return url.startswith('https://www.bestbuy.com') or url.startswith('https://bestbuy.com')
+        return url.startswith('https://www.walmart.com') or url.startswith('https://walmart.com')

@@ -12,4 +12,6 @@ snowflake-id
 selenium
 apscheduler
 flask_admin
-BeautifulSoup
+BeautifulSoup4
+cchardet
+lxml
