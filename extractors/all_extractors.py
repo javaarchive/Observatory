@@ -1,5 +1,7 @@
 from .Multiextractor import MultiExtractor
-extractors = [MultiExtractor]
+from .BestBuyExtractor import BestBuyExtractor
+from .WalmartExtractor import WalmartExtractor
+extractors = [MultiExtractor,BestBuyExtractor,WalmartExtractor]
 
 def create_instances():
     instances = []

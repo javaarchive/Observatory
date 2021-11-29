@@ -8,7 +8,7 @@ class MultiExtractor(ExtractorBase):
     def extract_data(self,url):
         ExtractorBase.extract_data(self,url) # superclass call
         content = self.driver.page_source
-        soup = BeautifulSoup(content, 'html.parser')
+        soup = BeautifulSoup(content, 'lxml')
         if "amazon" in url:                
             #for amazon
             # pw = soup.find('span', 'a-price-whole')
@@ -19,7 +19,7 @@ class MultiExtractor(ExtractorBase):
             }).children)
             #returns price
             print(priceElem.getText())
-            return priceElem.getText().replace("$","")#pw.get_text() + pf.get_text()
+            return float(priceElem.getText().replace("$",""))#pw.get_text() + pf.get_text()
 
         elif "target" in url:
             #for Target
@@ -28,7 +28,7 @@ class MultiExtractor(ExtractorBase):
             })
             #returns price only
             print(pw,pw.getText())
-            return pw.getText().replace("$","")
+            return float(pw.getText().replace("$",""))
         elif "google" in url:
             #for google shopping
             # div class for airpod, mac,  brands -> aULzUe IuHnof

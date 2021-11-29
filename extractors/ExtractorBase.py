@@ -4,12 +4,36 @@ from bs4 import BeautifulSoup
 
 import os
 class ExtractorBase:
+    globalDriver = None
+
     def __init__(self):
+        if ExtractorBase.globalDriver is not None:
+            self.driver = ExtractorBase.globalDriver
+            return
         if os.getenv('PHANTOMJS_LOCATION') is None:
-            self.driver = webdriver.Chrome(os.getenv('CHROMEDRIVER_LOCATION','/home/raymond/chromedriver'))
+            options = webdriver.ChromeOptions()
+            # options.add_argument("start-maximized")
+            options.add_experimental_option("excludeSwitches", ["enable-automation"])
+            options.add_experimental_option('useAutomationExtension', False)
+            self.driver = webdriver.Chrome(os.getenv('CHROMEDRIVER_LOCATION','/home/raymond/chromedriver'), options = options)
+            try:
+                from selenium_stealth import stealth
+                stealth(self.driver,
+                    languages=["en-US", "en"],
+                    vendor="Google Inc.",
+                    platform="Win32",
+                    webgl_vendor="Google Inc. (NVIDIA Corporation)",
+                    renderer="ANGLE (NVIDIA Corporation, NVIDIA GeForce GTX 1650/PCIe/SSE2, OpenGL 4.5.0 NVIDIA 470.74)",
+                    fix_hairline=True
+                )
+            except:
+                print("Selenium Stealth not found, this may increase your changes of being detected as a bot")
+                
         else:
-            self.driver = webdriver.PhantomJS(os.getenv('PHANTOMJS_LOCATION'))
+            self.driver = webdriver.PhantomJS(executable_path=os.getenv('PHANTOMJS_LOCATION'))
         self.driver.set_window_size(1920, 960)
+        # self.driver.set_page_load_timeout(60)
+        ExtractorBase.globalDriver = self.driver
     def extract_data(self, url):
         # return the relevant data for a url
         self.driver.get(url)

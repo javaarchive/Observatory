@@ -11,3 +11,7 @@ python-dotenv
 snowflake-id
 selenium
 apscheduler
+flask_admin
+BeautifulSoup4
+cchardet
+lxml
